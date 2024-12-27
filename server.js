@@ -1,8 +1,10 @@
+require('dotenv').config();  // Load environment variables from .env file
 const express = require('express');
 const path = require('path');
 const bodyParser = require('body-parser');
 const setupWebSocket = require('./ws/websocket');
 const apiRoutes = require('./routes/api');
+
 
 // Create an Express app
 const app = express();
