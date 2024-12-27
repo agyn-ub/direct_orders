@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WebSocket Client - Order Details</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+    }
+    label {
+      margin-top: 10px;
+      display: block;
+    }
+    input {
+      margin-bottom: 10px;
+      padding: 5px;
+      font-size: 1rem;
+      width: 100%;
+      max-width: 300px;
+    }
+    button {
+      padding: 10px 15px;
+      font-size: 1rem;
+      cursor: pointer;
+    }
+    #messages {
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+  <h1>WebSocket Client - Order Details</h1>
+  
+  <!-- Input Fields for Order Details -->
+  <label for="name">Product Name:</label>
+  <input type="text" id="name" placeholder="Enter product name" />
+
+  <label for="quantity">Quantity:</label>
+  <input type="number" id="quantity" placeholder="Enter quantity" />
+
+  <label for="contractNumber">Contract Number:</label>
+  <input type="text" id="contractNumber" placeholder="Enter contract number" />
+
+  <br>
+  <!-- Connect and Send Order buttons -->
+  <button id="connectBtn">Connect</button>
+  <button id="sendBtn" disabled>Send Order</button>
+
+  <!-- Message from Server -->
+  <div id="messages"></div>
+
+  <script>
+    let socket;
+
+    document.getElementById('connectBtn').onclick = () => {
+      // Create WebSocket connection to the server
+      socket = new WebSocket('ws://localhost:3000'); // Adjust to your server URL if needed
+      
+      socket.onopen = () => {
+        console.log('Connected to WebSocket server');
+        document.getElementById('sendBtn').disabled = false;
+      };
+
+      socket.onmessage = (event) => {
+        // Display server response in the 'messages' div
+        const messagesDiv = document.getElementById('messages');
+        messagesDiv.innerHTML += `<p>Server: ${event.data}</p>`;
+      };
+
+      socket.onclose = () => {
+        console.log('Disconnected from WebSocket server');
+        document.getElementById('sendBtn').disabled = true;
+      };
+    };
+
+    document.getElementById('sendBtn').onclick = () => {
+      if (socket && socket.readyState === WebSocket.OPEN) {
+        // Collect values from input fields and concatenate them into a string
+        const name = document.getElementById('name').value;
+        const quantity = document.getElementById('quantity').value;
+        const contractNumber = document.getElementById('contractNumber').value;
+
+        // Validate inputs
+        if (!name || !quantity || !contractNumber) {
+          alert('Please fill in all fields!');
+          return;
+        }
+
+        // Create a concatenated string with '@' separating values
+        const orderMessage = `${name}@${quantity}@${contractNumber}`;
+
+        // Send the order details as a plain string to the server
+        socket.send(orderMessage);
+        console.log('Order sent:', orderMessage);
+      }
+    };
+  </script>
+</body>
+</html>
+

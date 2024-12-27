@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WebSocket Client</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+    }
+    #messages {
+      margin-top: 20px;
+      border: 1px solid #ccc;
+      padding: 10px;
+      height: 200px;
+      overflow-y: scroll;
+    }
+    .input-group {
+      margin-top: 10px;
+    }
+    .input-group label {
+      display: block;
+      margin-bottom: 5px;
+    }
+    .input-group input {
+      width: calc(100% - 20px);
+      padding: 8px;
+      margin-bottom: 10px;
+    }
+    .input-group button {
+      padding: 8px 15px;
+    }
+  </style>
+</head>
+<body>
+  <h1>WebSocket Client</h1>
+
+  <!-- Form to send an array of items -->
+  <div class="input-group">
+    <label>Item Details:</label>
+    <input type="text" id="itemName" placeholder="Item Name">
+    <input type="number" id="itemPrice" placeholder="Item Price">
+    <input type="number" id="itemQuantity" placeholder="Item Quantity">
+    <button id="addItem">Add Item</button>
+    <button id="sendItems">Send Items</button>
+  </div>
+
+  <!-- Display area for server messages -->
+  <div id="messages"></div>
+
+  <script>
+    const serverUrl = 'wss://websocket-das-test-b749d65b100d.herokuapp.com/';
+    const clientId = '12345678'; // Unique identifier for the client
+    let socket;
+    let reconnectInterval = 7000; // 7 seconds
+    const items = []; // Array to hold items
+
+    const connectWebSocket = () => {
+      socket = new WebSocket(serverUrl);
+
+      socket.onopen = () => {
+        console.log('Connected to WebSocket server');
+
+        // Register as special client with the server
+        const registerMessage = JSON.stringify({
+          type: '1c_database',
+          clientId: clientId
+        });
+        socket.send(registerMessage);
+        console.log('Sent register message for client ID:', clientId);
+      };
+
+      socket.onmessage = (event) => {
+        // Display server response in the 'messages' div
+        const messagesDiv = document.getElementById('messages');
+        messagesDiv.innerHTML += `<p>Server: ${event.data}</p>`;
+        messagesDiv.scrollTop = messagesDiv.scrollHeight; // Auto-scroll to the bottom
+      };
+
+      socket.onclose = () => {
+        console.log('Disconnected from WebSocket server. Attempting to reconnect...');
+        setTimeout(connectWebSocket, reconnectInterval);
+      };
+
+      socket.onerror = (error) => {
+        console.error('WebSocket error:', error);
+        socket.close();
+      };
+    };
+
+    // Start WebSocket connection on page load
+    window.onload = () => {
+      connectWebSocket();
+
+      // Handle adding an item to the array
+      document.getElementById('addItem').addEventListener('click', () => {
+        const name = document.getElementById('itemName').value;
+        const price = parseFloat(document.getElementById('itemPrice').value);
+        const quantity = parseInt(document.getElementById('itemQuantity').value, 10);
+
+        if (name && !isNaN(price) && !isNaN(quantity)) {
+          items.push({ name, price, quantity });
+          console.log('Item added:', { name, price, quantity });
+          alert(`Item added: ${name}, Price: ${price}, Quantity: ${quantity}`);
+        } else {
+          alert('Please enter valid item details.');
+        }
+      });
+
+      // Handle sending the array of items
+      document.getElementById('sendItems').addEventListener('click', () => {
+        if (socket.readyState === WebSocket.OPEN && items.length > 0) {
+          const message = JSON.stringify({
+            clientId: clientId,
+            type: 'items',
+            items: items
+          });
+          socket.send(message);
+          console.log('Sent items:', items);
+          items.length = 0; // Clear the array after sending
+        } else {
+          alert('WebSocket is not connected or no items to send.');
+        }
+      });
+    };
+  </script>
+</body>
+</html>
