@@ -13,6 +13,9 @@ module.exports = (pool) => {
   
     try {
       const client = await pool.connect();
+  
+      // Truncate the 'items' table before inserting new items
+      await client.query('TRUNCATE TABLE items RESTART IDENTITY CASCADE');
       
       // Create a list of values for the batch insert
       const values = [];
@@ -45,6 +48,7 @@ module.exports = (pool) => {
       res.status(500).json({ error: err.message });
     }
   });
+  
   
   // Get all items
   router.get('/', async (req, res) => {
