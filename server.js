@@ -1,26 +1,29 @@
-require('dotenv').config();  // Load environment variables from .env file
+require('dotenv').config();
 const express = require('express');
-const path = require('path');
-const bodyParser = require('body-parser');
-const setupWebSocket = require('./ws/websocket');
-const apiRoutes = require('./routes/api');
-
-
-// Create an Express app
+const { Pool } = require('pg');
+const http = require('http'); // Use HTTP server for WebSocket compatibility
 const app = express();
-const port = process.env.PORT || 3000;
 
-// Middleware
-app.use(bodyParser.json());
-app.use(express.static(path.join(__dirname, 'public')));
+const itemsRoutes = require('./routes/items'); // Import items routes
+const { initializeDb } = require('./utils/db'); // Import initializeDb
+const setupWebSocket = require('./ws/websocket'); // Import WebSocket setup
 
-// REST API routes
-app.use('/api', apiRoutes);
-
-// Start the server
-const server = app.listen(port, () => {
-    console.log(`Server running on port ${port}`);
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL,
+  ssl: { rejectUnauthorized: false }
 });
 
-// WebSocket setup
+app.use(express.json());
+app.use('/items', itemsRoutes(pool)); // Use the items routes
+
+const PORT = process.env.PORT || 3000;
+
+// Create HTTP server for WebSocket support
+const server = http.createServer(app);
+
+// Set up WebSocket server
 setupWebSocket(server);
+
+initializeDb(pool).then(() => {
+  server.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+});
