@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Post Data with XMLHttpRequest</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+    }
+    #dataDisplay {
+      margin-top: 20px;
+      border: 1px solid #ccc;
+      padding: 10px;
+      height: 300px;
+      overflow-y: scroll;
+      white-space: pre-wrap; /* Preserves JSON formatting */
+    }
+    button {
+      padding: 10px 15px;
+      font-size: 16px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Click the Button to Send Data via POST</h1>
+  <button id="fetchButton">Send Data</button>
+
+  <div id="dataDisplay">Response will appear here...</div>
+
+  <script>
+    // Event listener function
+    function handleButtonClick() {
+      const postData = {
+        name: "Apple MacBook Pro 16",
+        data: {
+          year: 2019,
+          price: 1849.99,
+          "CPU model": "Intel Core i9",
+          "Hard disk size": "1 TB"
+        }
+      };
+
+      // Call function to send POST request
+      sendPostRequest(postData);
+    }
+
+    // Function to send POST request using XMLHttpRequest
+    function sendPostRequest(data) {
+      const apiUrl = 'https://websocket-das-test-b749d65b100d.herokuapp.com/items';
+      const displayElement = document.getElementById('dataDisplay');
+
+      // Show loading message
+      displayElement.innerHTML = 'Sending data...';
+
+      // Create a new XMLHttpRequest object
+      const xhr = new XMLHttpRequest();
+
+      // Configure it: POST-request for the URL
+      xhr.open('POST', apiUrl, true);
+
+      // Set the content type to JSON
+      xhr.setRequestHeader('Content-Type', 'application/json');
+
+      // Set up the onload callback
+      xhr.onload = () => {
+        if (xhr.status === 200) {
+          // Parse the JSON response
+          const responseData = JSON.parse(xhr.responseText);
+
+          // Display the fetched data as raw JSON
+          displayElement.innerHTML = `<h3>Response:</h3><pre>${JSON.stringify(responseData, null, 2)}</pre>`;
+        } else {
+          // Handle HTTP errors
+          displayElement.innerHTML = `Error: HTTP ${xhr.status}`;
+        }
+      };
+
+      // Handle network errors
+      xhr.onerror = () => {
+        displayElement.innerHTML = 'Network error occurred while sending data.';
+      };
+
+      // Send the POST request with the data
+      xhr.send(data);
+    }
+
+    // Adding the event listener for the button click
+    document.getElementById('fetchButton').addEventListener('click', handleButtonClick);
+  </script>
+</body>
+</html>
