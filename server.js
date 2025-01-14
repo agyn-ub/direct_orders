@@ -5,6 +5,7 @@ const http = require('http'); // Use HTTP server for WebSocket compatibility
 const app = express();
 
 const itemsRoutes = require('./routes/items'); // Import items routes
+const clientRoutes = require('./routes/clients'); // Import clients routes
 const { initializeDb } = require('./utils/db'); // Import initializeDb
 const setupWebSocket = require('./ws/websocket'); // Import WebSocket setup
 
@@ -15,6 +16,7 @@ const pool = new Pool({
 
 app.use(express.json());
 app.use('/items', itemsRoutes(pool)); // Use the items routes
+app.use('/clients', clientRoutes(pool)); // Use the clients routes
 
 const PORT = process.env.PORT || 3000;
 
