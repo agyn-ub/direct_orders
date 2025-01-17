@@ -9,6 +9,7 @@ async function initializeDb(pool) {
         name VARCHAR(255) NOT NULL,
         price DECIMAL(10, 2) NOT NULL,
         balance INTEGER NOT NULL,
+        ed VARCHAR(10) NOT NULL,
         vidprice VARCHAR(100) NOT NULL
       )
     `);
