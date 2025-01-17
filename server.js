@@ -14,6 +14,10 @@ const pool = new Pool({
   ssl: { rejectUnauthorized: false }
 });
 
+// Increase payload limit for JSON and URL-encoded requests
+app.use(express.json({ limit: '2mb' })); // Set JSON payload limit to 2 MB
+app.use(express.urlencoded({ limit: '2mb', extended: true })); // Set URL-encoded payload limit to 2 MB
+
 app.use(express.json());
 app.use('/items', itemsRoutes(pool)); // Use the items routes
 app.use('/clients', clientRoutes(pool)); // Use the clients routes

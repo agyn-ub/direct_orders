@@ -21,20 +21,21 @@ module.exports = (pool) => {
       const values = [];
       items.forEach((item, index) => {
         values.push(
-          `($${index * 4 + 1}, $${index * 4 + 2}, $${index * 4 + 3}, $${index * 4 + 4})`
+          `($${index * 5 + 1}, $${index * 5 + 2}, $${index * 5 + 3}, $${index * 5 + 4}, $${index * 5 + 5})`
         );
       });
 
       // Create a query to insert all items at once
       const query = `
-        INSERT INTO items (name, price, balance, vidprice) 
+        INSERT INTO items (name, price, balance, vidprice, ed) 
         VALUES ${values.join(', ')} 
         RETURNING *;
       `;
 
       // Flatten the values array to pass as query parameters
       const flattenedValues = items.reduce((acc, item) => {
-        acc.push(item.name, item.price, item.balance, item.vidprice);
+        const sanitizedPrice = parseFloat(item.price.replace(/\s+/g, ''));
+        acc.push(item.name, sanitizedPrice, item.balance, item.vidprice, item.ed);
         return acc;
       }, []);
 
