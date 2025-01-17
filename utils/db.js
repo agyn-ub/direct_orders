@@ -1,7 +1,7 @@
 async function initializeDb(pool) {
   try {
     const client = await pool.connect();
-
+    // postgresql
     // Create items table
     await client.query(`
       CREATE TABLE IF NOT EXISTS items (
