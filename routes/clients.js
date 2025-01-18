@@ -11,6 +11,13 @@ module.exports = (pool) => {
       return res.status(400).json({ error: 'Invalid data: clients array is required.' });
     }
 
+    // Filter out items with an empty 'code' field
+    const filteredItems = items.filter(client => client.code && client.code.trim() !== '');
+
+    if (filteredItems.length === 0) {
+      return res.status(400).json({ error: 'No valid items to insert: all items have empty code.' });
+    }
+
     try {
       const client = await pool.connect();
 
@@ -19,7 +26,7 @@ module.exports = (pool) => {
 
       // Prepare values for batch insertion
       const values = [];
-      items.forEach((client, index) => {
+      filteredItems.forEach((client, index) => {
         values.push(
           `($${index * 5 + 1}, $${index * 5 + 2}, $${index * 5 + 3}, $${index * 5 + 4}, $${index * 5 + 5})`
         );
@@ -27,19 +34,19 @@ module.exports = (pool) => {
 
       // Construct the batch insert query
       const query = `
-        INSERT INTO clients (nomenklatura, skidka, soglashenie, skidkaZnachenie, code) 
+        INSERT INTO clients (nomenklatura, skidka, soglashenie, skidkaznachenie, code) 
         VALUES ${values.join(', ')} 
         RETURNING *;
       `;
 
-      // Flatten the client data for query parameters
-      const flattenedValues = items.reduce((acc, client) => {
+      // Flatten the client data for query parameters, ensuring all keys are lowercase to match DB fields
+      const flattenedValues = filteredItems.reduce((acc, client) => {
         acc.push(
-          client.nomenklatura,
-          client.skidka,
-          client.soglashenie,
-          client.skidkaZnachenie,
-          client.code
+          client.Nomenklatura || null,        // Convert 'Nomenklatura' to 'nomenklatura'
+          client.Skidka || null,              // Convert 'Skidka' to 'skidka'
+          client.Soglashenie || null,         // Convert 'Soglashenie' to 'soglashenie'
+          client.SkidkaZnachenie || null,     // Convert 'SkidkaZnachenie' to 'skidkaznachenie'
+          client.code || null                 // Keep 'code' as is
         );
         return acc;
       }, []);

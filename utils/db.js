@@ -18,11 +18,11 @@ async function initializeDb(pool) {
     await client.query(`
       CREATE TABLE IF NOT EXISTS clients (
         id SERIAL PRIMARY KEY,
-        nomenklatura VARCHAR(255) NOT NULL,
-        skidka TEXT NOT NULL,
-        soglashenie TEXT NOT NULL,
-        skidkaZnachenie DECIMAL(5, 2) NOT NULL,
-        code VARCHAR(20) NOT NULL
+        nomenklatura VARCHAR(255),
+        skidka TEXT,
+        soglashenie TEXT,
+        skidkaZnachenie DECIMAL(5, 2),
+        code VARCHAR(20)
       )
     `);
 
