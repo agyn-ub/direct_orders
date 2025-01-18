@@ -27,7 +27,7 @@ module.exports = (pool) => {
 
       // Construct the batch insert query
       const query = `
-        INSERT INTO clients (nomenklatura, skidka, soglashenie, skidka_znachenie, code) 
+        INSERT INTO clients (nomenklatura, skidka, soglashenie, skidkaZnachenie, code) 
         VALUES ${values.join(', ')} 
         RETURNING *;
       `;
@@ -38,7 +38,7 @@ module.exports = (pool) => {
           client.nomenklatura,
           client.skidka,
           client.soglashenie,
-          client.skidka_znachenie,
+          client.skidkaZnachenie,
           client.code
         );
         return acc;

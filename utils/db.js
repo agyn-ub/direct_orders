@@ -21,7 +21,7 @@ async function initializeDb(pool) {
         nomenklatura VARCHAR(255) NOT NULL,
         skidka TEXT NOT NULL,
         soglashenie TEXT NOT NULL,
-        skidka_znachenie DECIMAL(5, 2) NOT NULL,
+        skidkaZnachenie DECIMAL(5, 2) NOT NULL,
         code VARCHAR(20) NOT NULL
       )
     `);
