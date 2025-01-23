@@ -91,9 +91,10 @@
         // Create a JSON object with the order details
         const orderMessage = JSON.stringify({
           contractNumber,
-          type: "order",
-          name,
-          quantity
+          items: [{
+            name,
+            quantity: parseInt(quantity)
+          }]
         });
 
         // Send the order details to the server

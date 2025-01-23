@@ -25,9 +25,8 @@ function setupWebSocket(server) {
                     }
                     ws.send('Registered as special client.');
                 } else {
-                    console.log('Message from regular client:', { name, quantity, contractNumber, items });
-                    // const responseMessage = `${name}@${quantity}@${contractNumber}`;
-                    // ws.send(responseMessage);
+                    console.log('Message from regular client:', {contractNumber, items });
+                    
                     if (Array.isArray(items)) {
                         console.log('Received array of items:', items);
                         ws.send(JSON.stringify(items));
