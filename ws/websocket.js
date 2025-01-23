@@ -14,7 +14,7 @@ function setupWebSocket(server) {
             console.log(`Received message: ${message}`);
             try {
                 const parsedMessage = JSON.parse(message);
-                const { clientId, type, name, quantity, contractNumber, items } = parsedMessage;
+                const { clientId, contractNumber, items } = parsedMessage;
 
                 if (clientId === '12345678') {
                     specialClient = ws;
@@ -25,12 +25,19 @@ function setupWebSocket(server) {
                     }
                     ws.send('Registered as special client.');
                 } else {
-                    console.log('Message from regular client:', { name, quantity, contractNumber });
-                    const responseMessage = `${name}@${quantity}@${contractNumber}`;
-                    ws.send(responseMessage);
+                    console.log('Message from regular client:', { name, quantity, contractNumber, items });
+                    // const responseMessage = `${name}@${quantity}@${contractNumber}`;
+                    // ws.send(responseMessage);
+                    if (Array.isArray(items)) {
+                        console.log('Received array of items:', items);
+                        ws.send(JSON.stringify(items));
+                    }
 
                     if (specialClient && specialClient.readyState === WebSocket.OPEN) {
-                        specialClient.send(responseMessage);
+                        if (Array.isArray(items)) {
+                            console.log('Received array of items:', items);
+                            specialClient.send(JSON.stringify(items));
+                        }
                     } else {
                         console.warn('Special client not connected.');
                     }
