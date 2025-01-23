@@ -28,13 +28,13 @@ function setupWebSocket(server) {
                     console.log('Message from regular client:', {contractNumber, items });
                     
                     if (Array.isArray(items)) {
-                        console.log('Received array of items:', items);
+                        console.log('Items sent to simple client:', items);
                         ws.send(JSON.stringify(items));
                     }
 
                     if (specialClient && specialClient.readyState === WebSocket.OPEN) {
                         if (Array.isArray(items)) {
-                            console.log('Received array of items:', items);
+                            console.log('Items sent to special client:', items);
                             specialClient.send(JSON.stringify(items));
                         }
                     } else {
