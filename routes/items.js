@@ -52,8 +52,11 @@ module.exports = (pool) => {
 
   // Get items with client discounts
   router.get('/', async (req, res) => {
+    console.log('GET /items request received');
     try {
       const { code } = req.query;
+      console.log('Client code:', code);
+      
       const query = `
         SELECT 
           i.name,
@@ -73,9 +76,12 @@ module.exports = (pool) => {
           (i.vidprice = 'Розничная')
           AND i.price != 0
       `;
+      console.log('Executing query with code:', code);
       const result = await pool.query(query, [code]);
+      console.log('Query results count:', result.rows.length);
       res.json(result.rows);
     } catch (err) {
+      console.error('Error in GET /items:', err);
       res.status(500).json({ error: err.message });
     }
   });
