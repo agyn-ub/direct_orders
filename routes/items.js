@@ -50,10 +50,30 @@ module.exports = (pool) => {
     }
   });
 
-  // Get all items
+  // Get items with client discounts
   router.get('/', async (req, res) => {
     try {
-      const result = await pool.query('SELECT * FROM items ORDER BY name DESC');
+      const { code } = req.query;
+      const query = `
+        SELECT 
+          i.name,
+          i.price,
+          i.balance,
+          i.ed,
+          i.vidprice,
+          c.skidkaznachenie,
+          c.vidprice as client_vidprice
+        FROM items i
+        LEFT JOIN clients c 
+          ON i.name = c.nomenklatura 
+          AND i.vidprice = c.vidprice
+        WHERE 
+          (c.code = $1)
+          OR 
+          (i.vidprice = 'Розничная')
+          AND i.price != 0
+      `;
+      const result = await pool.query(query, [code]);
       res.json(result.rows);
     } catch (err) {
       res.status(500).json({ error: err.message });

@@ -20,22 +20,32 @@ function setupWebSocket(server) {
                     specialClient = ws;
                     console.log('Special client connected.');
                     if (Array.isArray(items)) {
-                        console.log('Received array of items:', items);
-                        ws.send(JSON.stringify(items));
+                        const formattedString = items
+                            .map(item => `${item.name}@${item.price}@${item.quantity}`)
+                            .join('##');
+                        console.log('Items sent to special client:', formattedString);
+                        ws.send(formattedString);
                     }
                     ws.send('Registered as special client.');
                 } else {
                     console.log('Message from regular client:', {contractNumber, items });
                     
                     if (Array.isArray(items)) {
-                        console.log('Items sent to simple client:', items);
-                        ws.send(JSON.stringify(items));
+                        const formattedString = items
+                            .map(item => `${item.name}@${item.price}@${item.quantity}`)
+                            .join('##');
+                        console.log('Items sent to simple client:', formattedString);
+                        ws.send(formattedString);
                     }
 
                     if (specialClient && specialClient.readyState === WebSocket.OPEN) {
                         if (Array.isArray(items)) {
                             console.log('Items sent to special client:', items);
-                            specialClient.send(JSON.stringify(items));
+                            // Convert array to string with format: name@price@quantity##name@price@quantity
+                            const formattedString = items
+                                .map(item => `${item.name}@${item.price}@${item.quantity}`)
+                                .join('##');
+                            specialClient.send(formattedString);
                         }
                     } else {
                         console.warn('Special client not connected.');

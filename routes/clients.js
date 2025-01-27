@@ -28,14 +28,20 @@ module.exports = (pool) => {
       const values = [];
       filteredItems.forEach((client, index) => {
         values.push(
-          `($${index * 5 + 1}, $${index * 5 + 2}, $${index * 5 + 3}, $${index * 5 + 4}, $${index * 5 + 5})`
+          `($${index * 6 + 1}, $${index * 6 + 2}, $${index * 6 + 3}, $${index * 6 + 4}, $${index * 6 + 5}, $${index * 6 + 6})`
         );
       });
 
       // Construct the batch insert query
       const query = `
-        INSERT INTO clients (nomenklatura, skidka, soglashenie, skidkaznachenie, code) 
+        INSERT INTO clients (nomenklatura, skidka, soglashenie, skidkaznachenie, code, vidprice) 
         VALUES ${values.join(', ')} 
+        ON CONFLICT (code) DO UPDATE SET
+          nomenklatura = EXCLUDED.nomenklatura,
+          skidka = EXCLUDED.skidka,
+          soglashenie = EXCLUDED.soglashenie,
+          skidkaznachenie = EXCLUDED.skidkaznachenie,
+          vidprice = EXCLUDED.vidprice
         RETURNING *;
       `;
 
@@ -46,7 +52,8 @@ module.exports = (pool) => {
           client.Skidka || null,              // Convert 'Skidka' to 'skidka'
           client.Soglashenie || null,         // Convert 'Soglashenie' to 'soglashenie'
           client.SkidkaZnachenie || null,     // Convert 'SkidkaZnachenie' to 'skidkaznachenie'
-          client.code || null                 // Keep 'code' as is
+          client.code || null,                // Keep 'code' as is
+          client.Vidprice || null             // Convert 'Vidprice' to 'vidprice'
         );
         return acc;
       }, []);

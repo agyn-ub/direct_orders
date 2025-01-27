@@ -22,7 +22,8 @@ async function initializeDb(pool) {
         skidka TEXT,
         soglashenie TEXT,
         skidkaZnachenie DECIMAL(5, 2),
-        code VARCHAR(20)
+        code VARCHAR(20) UNIQUE,
+        vidprice VARCHAR(100)
       )
     `);
 
