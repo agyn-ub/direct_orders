@@ -10,7 +10,8 @@ async function initializeDb(pool) {
         price DECIMAL(10, 2) NOT NULL,
         balance INTEGER NOT NULL,
         ed VARCHAR(10),
-        vidprice VARCHAR(100) NOT NULL
+        vidprice VARCHAR(100) NOT NULL,
+        coefficient INTEGER NOT NULL
       )
     `);
 

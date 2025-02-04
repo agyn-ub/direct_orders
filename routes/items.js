@@ -21,13 +21,13 @@ module.exports = (pool) => {
       const values = [];
       items.forEach((item, index) => {
         values.push(
-          `($${index * 5 + 1}, $${index * 5 + 2}, $${index * 5 + 3}, $${index * 5 + 4}, $${index * 5 + 5})`
+          `($${index * 6 + 1}, $${index * 6 + 2}, $${index * 6 + 3}, $${index * 6 + 4}, $${index * 6 + 5}, $${index * 6 + 6})`
         );
       });
 
       // Create a query to insert all items at once
       const query = `
-        INSERT INTO items (name, price, balance, vidprice, ed) 
+        INSERT INTO items (name, price, balance, vidprice, ed, coefficient) 
         VALUES ${values.join(', ')} 
         RETURNING *;
       `;
@@ -35,7 +35,7 @@ module.exports = (pool) => {
       // Flatten the values array to pass as query parameters
       const flattenedValues = items.reduce((acc, item) => {
         const sanitizedPrice = parseFloat(item.price.replace(/\s+/g, ''));
-        acc.push(item.name, sanitizedPrice, item.balance, item.vidprice, item.ed);
+        acc.push(item.name, sanitizedPrice, item.balance, item.vidprice, item.ed, item.coefficient);
         return acc;
       }, []);
 
@@ -64,6 +64,7 @@ module.exports = (pool) => {
           i.balance,
           i.ed,
           i.vidprice,
+          i.coefficient,
           c.skidkaznachenie,
           c.vidprice as client_vidprice
         FROM items i
